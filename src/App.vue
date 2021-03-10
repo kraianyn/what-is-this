@@ -10,11 +10,22 @@
 
 <script>
 
+const axios = require('axios');
+const REQUEST = 'https://www.wikipedia.org/w/api.php?action=opensearch&format=json&search=';
+
 export default {
     name: 'App',
     methods: {
         findArticles() {
-            console.log(this.entity);
+            if (this.entity) {
+                axios.get(REQUEST + this.entity.replace(' ', '%20'))
+                    .then((response) => {
+                        console.log(response);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            }
         }
     }
 }
@@ -36,12 +47,12 @@ body {
 }
 
 #container {
-    width: 40%;
-    margin: 5% auto;
+    width: 60%;
+    margin: 15vh auto;
 }
 
 img {
-    width: 50%;
+    height: 50vh;
     display: block;
     margin: 0 auto;
 }
@@ -51,7 +62,7 @@ img {
     gap: 3%;
     justify-content: center;
     flex-wrap: wrap;
-    margin-top: 10%;
+    margin-top: 10vh;
 }
 
 input, button {
