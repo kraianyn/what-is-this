@@ -2,8 +2,8 @@
     <div id="container">
         <img src="./assets/logo.png">
         <div id="search-row">
-            <input v-model.trim="entity" type="text" placeholder="будь-що у Всесвіті">
-            <button @click="findArticles">знайти статті</button>
+            <input @keyup="updateButton" v-model.trim="entity" type="text" placeholder="будь-що у Всесвіті">
+            <button @click="findArticles" :style="{display: buttonDisplay}">знайти статті</button>
         </div>
     </div>
 </template>
@@ -11,11 +11,19 @@
 <script>
 
 const axios = require('axios');
-const REQUEST = 'https://www.wikipedia.org/w/api.php?action=opensearch&format=json&search=';
+const REQUEST = 'https://www.wikipedia.org/w/api.php?&action=opensearch&format=json&search=';
 
 export default {
     name: 'App',
+    data() {
+        return {
+            buttonDisplay: 'none'
+        }
+    },
     methods: {
+        updateButton() {
+            this.buttonDisplay = (this.entity ? 'inline-block' : 'none');
+        },
         findArticles() {
             if (this.entity) {
                 axios.get(REQUEST + this.entity.replace(' ', '%20'))
@@ -89,6 +97,7 @@ input::placeholder {
 }
 
 button {
+    white-space: nowrap;
     flex-grow: 1;
     box-shadow: 0 0 5px 0 #111;
 }
