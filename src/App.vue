@@ -1,9 +1,9 @@
 <template>
     <div id="container">
-        <img :style="{'animation': logoAnimation}" src="./assets/logo.png">
+        <img :style="{animation: logoAnimation}" src="./assets/logo.png">
         <div id="search-row">
-            <input @keyup="updateButton" v-model.trim="entity" type="text" placeholder="будь-що у Всесвіті">
-            <button @click="findArticles" :style="{'display': buttonDisplay}">знайти статті</button>
+            <input type="text" v-model.trim="entity" @keyup="updateButton" placeholder="будь-що у Всесвіті">
+            <button :style="{display: buttonDisplay}" @click="findArticles">знайти статті</button>
         </div>
         <div id="articles">
             <ArticleLink v-for="article in articles" :key="article.id" :text="article.title" :link="article.link"/>
@@ -63,7 +63,6 @@ export default {
 </script>
 
 <style>
-
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap');
 
@@ -142,7 +141,7 @@ button:hover {
 }
 
 #articles {
-    margin-top: 8vh;
+    margin: 8vh 0;
 }
 
 </style>
