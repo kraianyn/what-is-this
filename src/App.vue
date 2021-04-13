@@ -1,39 +1,61 @@
 <template>
     <div id="container">
-        <img src="./assets/logo.png">
+        <img :style="{'animation': logoAnimation}" src="./assets/logo.png">
         <div id="search-row">
             <input @keyup="updateButton" v-model.trim="entity" type="text" placeholder="будь-що у Всесвіті">
-            <button @click="findArticles" :style="{display: buttonDisplay}">знайти статті</button>
+            <button @click="findArticles" :style="{'display': buttonDisplay}">знайти статті</button>
+        </div>
+        <div id="articles">
+            <ArticleLink v-for="article in articles" :key="article.id" :text="article.title" :link="article.link"/>
         </div>
     </div>
 </template>
 
 <script>
-
+import ArticleLink from './components/ArticleLink.vue'
 const axios = require('axios');
-const REQUEST = 'https://www.wikipedia.org/w/api.php?&action=opensearch&format=json&search=';
+
+const LOGO_OUT_DURATION_S = .7;  // duration (in seconds) of the animation applied to the logo before the search results are shown
 
 export default {
     name: 'App',
+    components: {ArticleLink},
     data() {
         return {
-            buttonDisplay: 'none'
+            buttonDisplay: 'none',
+            logoAnimation: 'none',
+            articles: []
         }
     },
     methods: {
         updateButton() {
-            this.buttonDisplay = (this.entity ? 'inline-block' : 'none');
+            this.buttonDisplay = this.entity ? 'inline-block' : 'none';
         },
         findArticles() {
-            if (this.entity) {
-                axios.get(REQUEST + this.entity.replace(' ', '%20'))
-                    .then((response) => {
-                        console.log(response);
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                    });
+            // if the search box is not empty (although the button should be hidden if it is, there may be a tiny delay)
+            if (!this.entity) {
+                return;
             }
+
+            let request = `${location.protocol}//en.wikipedia.org/w/api.php?origin=*&action=opensearch&format=json&search=${encodeURIComponent(this.entity)}`;
+            axios.get(request).then((response) => {
+                let displayDelay = 0;  // no delay unless it is the first search
+                if (this.logoAnimation == 'none') {  // if no searches have been made yet
+                    this.logoAnimation = `${LOGO_OUT_DURATION_S}s forwards logoOut`;  // makes the logo escape, freeing the space for the search results
+                    displayDelay = LOGO_OUT_DURATION_S * 1000;  // delay (in milliseconds) until after the logo has escaped
+                }
+
+                setTimeout(() => {
+                    this.articles = [];
+                    response.data[1].forEach((articleTitle, articleIndex) => {
+                        this.articles.push({
+                            id: articleIndex,
+                            title: articleTitle,
+                            link: response.data[3][articleIndex]
+                        });
+                    });
+                }, displayDelay)
+            }).catch(error => console.error(error));
         }
     }
 }
@@ -45,6 +67,12 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap');
 
+:root{
+    --container-margin-top: 15vh;
+    --logo-height: 50vh;
+    --inner-shadow: inset 0 0 5px 0 #000;
+}
+
 * {
     padding: 0;
     margin: 0;
@@ -55,14 +83,21 @@ body {
 }
 
 #container {
+    font: 1.2rem 'Raleway', arial;
     width: 60%;
-    margin: 15vh auto;
+    margin: var(--container-margin-top) auto 0;
 }
 
 img {
-    height: 50vh;
+    height: var(--logo-height);
     display: block;
     margin: 0 auto;
+}
+
+@keyframes logoOut {
+    to {
+        margin-top: calc((var(--container-margin-top) + var(--logo-height)) * -1);
+    }
 }
 
 #search-row {
@@ -90,7 +125,7 @@ input:focus, button:focus {
 
 input {
     flex-grow: 8;
-    box-shadow: inset 0 0 5px 0 #000;
+    box-shadow: var(--inner-shadow);
 }
 input::placeholder {
     color: #aaa;
@@ -104,6 +139,10 @@ button {
 button:hover {
     cursor: pointer;
     background-color: #555;
+}
+
+#articles {
+    margin-top: 8vh;
 }
 
 </style>
