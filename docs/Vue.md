@@ -360,7 +360,7 @@ export default {
 
 ---
 
-За [офіційною документацією **Vue**](https://v3.vuejs.org/guide/introduction.html).
+За [офіційною документацією **Vue 3**](https://v3.vuejs.org/guide/introduction.html).
 
 **Віктор Бугайов** &nbsp;|&nbsp; студент НТУУ "КПІ", ФІОТ &nbsp;|&nbsp; vict.aiov@gmail.com
 
